@@ -19,16 +19,27 @@ var services = CreateServices();
 var logger = LogManager.GetCurrentClassLogger();
 logger.Info("Service started");
 
+
+
 ISimulator app = services.GetRequiredService<ISimulator>();
 IRobot robot = services.GetRequiredService<IRobot>();
 
 Invoker invoker = new Invoker(app, robot);
 // process command 
-var r = invoker.ProcessCommand(new string[] { "PLACE 0,3,NORTH", "MOVE", "REPORT" });
-var result = robot.Report();
+var currentDirectory = Directory.GetCurrentDirectory() + "/Inputs.txt";
+if (File.Exists(currentDirectory))
+{
+    string[] commands = File.ReadAllLines(currentDirectory);
+    if (commands != null)
+    {
+        //var r = invoker.ProcessCommand(new string[] { "PLACE 0,5,NORTH", "MOVE", "REPORT" });
+        var r = invoker.ProcessCommand(commands);        
+        var result = robot.Report();
+        Console.WriteLine(result.ToString());
+        Console.Read();
+    }
+}
 
-Console.WriteLine(result.ToString());
-Console.Read();
 
 static ServiceProvider CreateServices()
 {
